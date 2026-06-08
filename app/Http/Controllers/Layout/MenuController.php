@@ -32,7 +32,7 @@ class MenuController extends Controller
         $query = Menu::with(['children', 'parent', 'permissions']);
 
         if ($req->filled('search')) {
-            $query->where('label', 'like', '%' . $req->search . '%');
+            $query->where('label', 'like', '%'.$req->search.'%');
         }
 
         // 🔍 Filtro por permiso
@@ -45,10 +45,13 @@ class MenuController extends Controller
             $query->where('parent_id', $req->parent_id);
         }
 
-        // 📄 Paginación (10 por página por defecto)
-        $menus = $query->orderBy('order')->paginate($req->integer('per_page', 3));
+        $perPage = in_array((int) $req->per_page, [10, 25, 50, 100]) ? (int) $req->per_page : 10;
+        $menus = $query->orderBy('order')->paginate($perPage)->withQueryString();
 
-        return Inertia::render('layouts/menu/index', compact('menus', 'permissions', 'routes'));
+        $filters = $req->only('search', 'permission', 'parent_id', 'per_page');
+        $parents = Menu::whereNull('parent_id')->orderBy('label')->get(['id', 'label']);
+
+        return Inertia::render('layouts/menu/index', compact('menus', 'permissions', 'routes', 'filters', 'parents'));
     }
 
     /**
@@ -70,12 +73,15 @@ class MenuController extends Controller
             'icon' => 'nullable|string|max:255',
             'parent_id' => 'nullable|exists:menus,id',
             'order' => 'nullable|numeric',
-            'permission' => 'nullable|string|max:255'
+            'permission' => 'nullable|string|max:255',
         ]);
 
         $validated['order'] = (int) $validated['order'];
+        $validated['href'] = $validated['href'] ?: null;
+        $validated['permission'] = $validated['permission'] ?: null;
 
         Menu::create($validated);
+
         return back()->with('success', 'Menú creado correctamente');
     }
 
@@ -98,9 +104,24 @@ class MenuController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Menu $menu)
     {
-        //
+        $validated = $request->validate([
+            'label' => 'required|string|max:255',
+            'href' => 'nullable|string|max:255',
+            'icon' => 'nullable|string|max:255',
+            'parent_id' => 'nullable|exists:menus,id',
+            'order' => 'nullable|numeric',
+            'permission' => 'nullable|string|max:255',
+        ]);
+
+        $validated['order'] = (int) ($validated['order'] ?? 0);
+        $validated['href'] = $validated['href'] ?: null;
+        $validated['permission'] = $validated['permission'] ?: null;
+
+        $menu->update($validated);
+
+        return back()->with('success', 'Menú actualizado correctamente.');
     }
 
     /**
@@ -109,6 +130,7 @@ class MenuController extends Controller
     public function destroy(Menu $menu)
     {
         $menu->delete();
+
         return back()->with('success', 'Menú eliminado');
     }
 }

@@ -2,28 +2,56 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class CreateRoles extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $adminRole = Role::create(['name' => 'admin']);
-        $managerRole = Role::create(['name' => 'employee']);
-        $userRole = Role::create(['name' => 'user']);
+        $permissions = [
+            // Admin
+            'admin.users',
+            'admin.roles',
+            'admin.permissions',
+            // Agenda
+            'agenda.view',
+            'agenda.create',
+            'agenda.edit',
+            'agenda.delete',
+            // Clientes
+            'clients.view',
+            'clients.create',
+            'clients.edit',
+            'clients.delete',
+            // Servicios
+            'services.view',
+            'services.create',
+            'services.edit',
+            'services.delete',
+            // Finanzas
+            'finance.view',
+            'finance.create',
+            'finance.edit',
+            'finance.delete',
+        ];
 
-        Permission::create(['name' => 'Administrator']);
-        Permission::create(['name' => 'assign teams']);
-        Permission::create(['name' => 'assign roles']);
-        Permission::create(['name' => 'assign permissions']);
+        foreach ($permissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm]);
+        }
 
-        // Asignar permisos a roles
-        $adminRole->givePermissionTo(['Administrator', 'assign teams', 'assign roles', 'assign permissions']);
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $employee = Role::firstOrCreate(['name' => 'employee']);
+        Role::firstOrCreate(['name' => 'user']);
+
+        $admin->syncPermissions($permissions);
+
+        $employee->syncPermissions([
+            'agenda.view', 'agenda.create', 'agenda.edit',
+            'clients.view', 'clients.create', 'clients.edit',
+            'services.view',
+            'finance.view',
+        ]);
     }
 }

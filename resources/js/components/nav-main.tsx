@@ -5,32 +5,16 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { DynamicIcon } from '@/components/dynamic-icon';
 import { Menu } from '@/types/menu';
 import { Link, usePage } from '@inertiajs/react';
-import {
-    ChevronDown,
-    ChevronRight,
-    LayoutGrid,
-    LucideIcon,
-    Menu as MenuIcon,
-    Shield,
-    Users,
-    UserRound,
-} from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-// import type { MenuSidebarItem } from '@/components/app-sidebar';
-
-const icons: Record<string, LucideIcon> = {
-    dashboard: LayoutGrid,
-    admin: Shield,
-    menus: MenuIcon,
-    users: Users,
-    equipos: UserRound,
-};
 
 interface NavMainProps {
     items: Menu[];
     userPermissions: string[];
+    userRoles?: string[];
 }
 
 type OpenMenus = Record<number, boolean>;
@@ -83,29 +67,36 @@ function findOpenMenusByUrl(items: Menu[], currentUrl: string): OpenMenus {
     return openMenus;
 }
 
-function canSeeMenu(item: Menu, userPermissions: string[]): boolean {
-    if (item.permission && !userPermissions.includes(item.permission)) {
-        return false;
+function canSeeMenu(item: Menu, userPermissions: string[], userRoles: string[]): boolean {
+    // Chequea el campo `permission` contra permisos Spatie Y contra nombres de roles
+    if (item.permission) {
+        const hasPermission = userPermissions.includes(item.permission);
+        const hasRole = userRoles.some(
+            (r) => r.toLowerCase() === item.permission!.toLowerCase(),
+        );
+        if (!hasPermission && !hasRole) return false;
     }
 
+    // Chequea la relación many-to-many `permissions`
     if (!item.permissions || item.permissions.length === 0) {
         return true;
     }
 
     return item.permissions.some((permission: { name: string }) =>
-        userPermissions.includes(permission.name)
+        userPermissions.includes(permission.name),
     );
 }
 
 function filterMenuByPermissions(
     items: Menu[],
-    userPermissions: string[]
+    userPermissions: string[],
+    userRoles: string[],
 ): Menu[] {
     return items
-        .filter((item) => canSeeMenu(item, userPermissions))
+        .filter((item) => canSeeMenu(item, userPermissions, userRoles))
         .map((item) => ({
             ...item,
-            children: filterMenuByPermissions(item.children ?? [], userPermissions),
+            children: filterMenuByPermissions(item.children ?? [], userPermissions, userRoles),
         }))
         .filter((item) => {
             const hasHref = Boolean(item.href);
@@ -115,13 +106,13 @@ function filterMenuByPermissions(
         });
 }
 
-export function NavMain({ items = [], userPermissions = [] }: NavMainProps) {
+export function NavMain({ items = [], userPermissions = [], userRoles = [] }: NavMainProps) {
     const page = usePage();
     const [openMenus, setOpenMenus] = useState<OpenMenus>({});
 
     const filteredItems = useMemo(() => {
-        return filterMenuByPermissions(items, userPermissions);
-    }, [items, userPermissions]);
+        return filterMenuByPermissions(items, userPermissions, userRoles);
+    }, [items, userPermissions, userRoles]);
 
     useEffect(() => {
         setOpenMenus(findOpenMenusByUrl(filteredItems, page.url));
@@ -139,7 +130,6 @@ export function NavMain({ items = [], userPermissions = [] }: NavMainProps) {
             const hasChildren = Boolean(item.children && item.children.length > 0);
             const isActive = isItemActive(item, page.url);
             const isOpen = openMenus[item.id] ?? false;
-            const Icon = item.icon ? icons[item.icon] : undefined;
 
             const paddingLeft = `${level * 16 + 8}px`;
 
@@ -152,7 +142,7 @@ export function NavMain({ items = [], userPermissions = [] }: NavMainProps) {
                             onClick={() => toggleMenu(item.id)}
                             style={{ paddingLeft }}
                         >
-                            {Icon && <Icon />}
+                            <DynamicIcon value={item.icon} className="h-4 w-4 shrink-0" />
                             <span>{item.label}</span>
 
                             {isOpen ? (
@@ -184,7 +174,7 @@ export function NavMain({ items = [], userPermissions = [] }: NavMainProps) {
                         style={{ paddingLeft }}
                     >
                         <Link href={item.href} prefetch>
-                            {Icon && <Icon />}
+                            <DynamicIcon value={item.icon} className="h-4 w-4 shrink-0" />
                             <span>{item.label}</span>
                         </Link>
                     </SidebarMenuButton>
@@ -194,9 +184,8 @@ export function NavMain({ items = [], userPermissions = [] }: NavMainProps) {
     };
 
     return (
-        <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
-
+        <SidebarGroup className="px-3 py-2">
+            <SidebarGroupLabel>Navegación</SidebarGroupLabel>
             <SidebarMenu>
                 {renderItems(filteredItems)}
             </SidebarMenu>

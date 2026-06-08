@@ -44,19 +44,24 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error'),
+            ],
             'auth' => [
                 'user' => $request->user(),
+                'roles' => $user ? $user->getRoleNames()->values() : [],
                 'permissions' => $user
                     ? $user->getAllPermissions()->pluck('name')->values()
                     : [],
 
                 'menuSidebar' => $user
                     ? Menu::query()
-                    ->whereNull('parent_id')
-                    ->with(['children', 'permissions'])
-                    ->orderBy('order')
-                    ->get()
-                    ->values()
+                        ->whereNull('parent_id')
+                        ->with(['children', 'permissions'])
+                        ->orderBy('order')
+                        ->get()
+                        ->values()
                     : [],
             ],
         ]);

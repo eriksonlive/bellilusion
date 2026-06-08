@@ -1,12 +1,15 @@
 <?php
 
-use App\Http\Controllers\Layout\MenuController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
+
+Route::get('offline', function () {
+    return view('offline');
+})->name('offline');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', function () {
@@ -16,4 +19,7 @@ Route::middleware(['auth'])->group(function () {
 
 require __DIR__.'/settings.php';
 require __DIR__.'/admin.php';
+require __DIR__.'/agenda.php';
+require __DIR__.'/finance.php';
+require __DIR__.'/clients.php';
 require __DIR__.'/auth.php';
