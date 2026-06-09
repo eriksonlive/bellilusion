@@ -70,8 +70,9 @@ function findOpenMenusByUrl(items: Menu[], currentUrl: string): OpenMenus {
 function canSeeMenu(item: Menu, userPermissions: string[], userRoles: string[]): boolean {
     // Chequea el campo `permission` contra permisos Spatie Y contra nombres de roles
     if (item.permission) {
+        const roles = userRoles ?? [];
         const hasPermission = userPermissions.includes(item.permission);
-        const hasRole = userRoles.some(
+        const hasRole = roles.some(
             (r) => r.toLowerCase() === item.permission!.toLowerCase(),
         );
         if (!hasPermission && !hasRole) return false;
@@ -93,10 +94,10 @@ function filterMenuByPermissions(
     userRoles: string[],
 ): Menu[] {
     return items
-        .filter((item) => canSeeMenu(item, userPermissions, userRoles))
+        .filter((item) => canSeeMenu(item, userPermissions, userRoles ?? []))
         .map((item) => ({
             ...item,
-            children: filterMenuByPermissions(item.children ?? [], userPermissions, userRoles),
+            children: filterMenuByPermissions(item.children ?? [], userPermissions, userRoles ?? []),
         }))
         .filter((item) => {
             const hasHref = Boolean(item.href);

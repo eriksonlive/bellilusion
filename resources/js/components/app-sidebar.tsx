@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, Key, Shield, Users } from 'lucide-react';
+import { Key, LayoutList, Shield, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import { SharedProps } from '@/types/menu';
 
@@ -34,6 +34,7 @@ export function AppSidebar() {
         { title: 'Usuarios', href: route('admin.users.index'), icon: Users },
         { title: 'Roles', href: route('admin.roles.index'), icon: Shield },
         { title: 'Permisos', href: route('admin.permissions.index'), icon: Key },
+        { title: 'Menús', href: route('admin.menus.index'), icon: LayoutList },
     ];
 
     return (

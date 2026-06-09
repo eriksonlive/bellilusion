@@ -228,6 +228,9 @@ body {
 
 /* ── Berry card shadow ──────────────────────────────────────── */
 .card-berry {
+    background: var(--card);
+    color: var(--card-foreground);
+    border-radius: var(--radius-lg);
     box-shadow: 0 2px 14px 0 rgba(32, 40, 45, 0.08);
     border: none;
 }
