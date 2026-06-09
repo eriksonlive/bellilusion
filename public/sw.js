@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bellilusion-v1';
+const CACHE_NAME = 'bellilusion-v2';
 
 const STATIC_ASSETS = [
     '/',
