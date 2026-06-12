@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Appointment extends Model
 {
@@ -36,6 +37,7 @@ class Appointment extends Model
         return $this->belongsTo(Client::class);
     }
 
+    /** @deprecated Use services() relation instead */
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
@@ -44,5 +46,19 @@ class Appointment extends Model
     public function slot(): BelongsTo
     {
         return $this->belongsTo(AvailabilitySlot::class, 'availability_slot_id');
+    }
+
+    public function services(): BelongsToMany
+    {
+        return $this->belongsToMany(Service::class, 'appointment_services')
+            ->withPivot(['price', 'quantity'])
+            ->withTimestamps();
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'appointment_products')
+            ->withPivot(['price', 'quantity'])
+            ->withTimestamps();
     }
 }

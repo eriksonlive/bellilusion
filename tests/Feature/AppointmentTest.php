@@ -29,7 +29,7 @@ it('creates appointment with valid data', function () {
 
     $this->actingAs($user)
         ->post(route('agenda.store'), [
-            'service_id' => $service->id,
+            'services' => [$service->id],
             'client_id' => $client->id,
             'date' => '2026-07-01',
             'start_time' => '09:00',
@@ -42,7 +42,7 @@ it('creates appointment with valid data', function () {
     expect(AvailabilitySlot::count())->toBe(1);
 });
 
-it('fails to create appointment without service', function () {
+it('fails to create appointment without services', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)
@@ -51,7 +51,7 @@ it('fails to create appointment without service', function () {
             'start_time' => '09:00',
             'end_time' => '10:00',
         ])
-        ->assertSessionHasErrors('service_id');
+        ->assertSessionHasErrors('services');
 });
 
 it('updates appointment status', function () {
@@ -64,10 +64,11 @@ it('updates appointment status', function () {
         'availability_slot_id' => $slot->id,
         'status' => 'pending',
     ]);
+    $appointment->services()->attach($service->id, ['price' => $service->price, 'quantity' => 1]);
 
     $this->actingAs($user)
         ->put(route('agenda.update', $appointment), [
-            'service_id' => $service->id,
+            'services' => [$service->id],
             'date' => $slot->date->format('Y-m-d'),
             'start_time' => '09:00',
             'end_time' => '10:00',

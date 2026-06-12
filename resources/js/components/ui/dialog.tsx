@@ -36,12 +36,25 @@ const DialogContent = React.forwardRef<
         <DialogPrimitive.Content
             ref={ref}
             className={cn(
-                'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg max-h-[90vh] overflow-y-auto [scrollbar-gutter:stable] translate-x-[-50%] translate-y-[-50%] gap-4 bg-card p-6 shadow-[0_8px_32px_0_rgba(32,40,45,0.18)] duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+                // Mobile: bottom sheet (full width, rounded top, slide-up)
+                'fixed bottom-0 left-0 right-0 z-50 w-full bg-card p-5 pb-safe shadow-[0_-4px_32px_0_rgba(32,40,45,0.15)]',
+                'max-h-[92dvh] overflow-y-auto [scrollbar-gutter:stable]',
+                'rounded-t-[var(--radius-lg)] rounded-b-none',
+                'data-[state=open]:animate-in data-[state=closed]:animate-out',
+                'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
+                'duration-300',
+                // Desktop: centered modal
+                'sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%]',
+                'sm:rounded-[var(--radius-lg)]',
+                'sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0',
+                'sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95',
+                'sm:data-[state=closed]:fade-out-0 sm:data-[state=open]:fade-in-0',
                 className,
             )}
-            style={{ borderRadius: 'var(--radius-lg)' }}
             {...props}
         >
+            {/* Drag handle (mobile only) */}
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-muted-foreground/20 sm:hidden" />
             {children}
             <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
                 <X className="h-4 w-4" />

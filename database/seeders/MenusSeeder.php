@@ -57,13 +57,22 @@ class MenusSeeder extends Seeder
             'permission' => null,
         ]);
 
+        Menu::create([
+            'label' => 'Productos',
+            'href' => '/products',
+            'icon' => 'fa:FaBoxOpen',
+            'parent_id' => null,
+            'order' => 6,
+            'permission' => null,
+        ]);
+
         // Grupo Admin (solo visible para el rol admin)
         $admin = Menu::create([
             'label' => 'Admin',
             'href' => null,
             'icon' => 'Cog',
             'parent_id' => null,
-            'order' => 6,
+            'order' => 7,
             'permission' => 'admin',
         ]);
 

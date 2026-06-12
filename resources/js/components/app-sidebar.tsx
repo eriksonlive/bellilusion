@@ -55,8 +55,10 @@ export function AppSidebar() {
                 <NavMain items={menuItems} userPermissions={permissions} userRoles={roles} />
 
                 {isAdmin && (
-                    <SidebarGroup className="px-3 py-2">
-                        <SidebarGroupLabel>Administración</SidebarGroupLabel>
+                    <SidebarGroup className="px-3 py-2 overflow-hidden">
+                        <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden group-data-[collapsible=icon]:pointer-events-none">
+                            Administración
+                        </SidebarGroupLabel>
                         <SidebarMenu>
                             {adminLinks.map((item) => (
                                 <SidebarMenuItem key={item.href}>

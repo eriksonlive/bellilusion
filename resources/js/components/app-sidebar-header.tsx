@@ -1,4 +1,5 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import NotificationBell from '@/components/notification-bell';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { Search } from 'lucide-react';
@@ -26,8 +27,10 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                 </div>
             </div>
 
-            {/* Right: space for future actions */}
-            <div className="ml-auto" />
+            {/* Right: notifications */}
+            <div className="ml-auto flex items-center">
+                <NotificationBell />
+            </div>
         </header>
     );
 }

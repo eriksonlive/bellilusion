@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { CalendarDays, Mail, Pencil, Phone, Plus, Search, Trash2, User, X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -37,7 +37,6 @@ function Avatar({ name }: { name: string }) {
 }
 
 export default function ClientsIndex({ clients, filters }: Props) {
-    const { flash } = usePage<{ flash: { success?: string } }>().props;
     const [showModal, setShowModal] = useState(false);
     const [editingClient, setEditingClient] = useState<Client|null>(null);
     const [searchValue, setSearchValue] = useState(filters.search??'');
@@ -74,13 +73,6 @@ export default function ClientsIndex({ clients, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Clientes"/>
             <div className="flex flex-col gap-5 p-5">
-
-                {flash?.success && (
-                    <div className="flex items-center gap-3 bg-green-50 px-4 py-3 text-sm text-green-700 ring-1 ring-green-200" style={{borderRadius:'var(--radius)'}}>
-                        <span className="h-2 w-2 rounded-full bg-green-500"/>
-                        {flash.success}
-                    </div>
-                )}
 
                 {/* ── Tabla card ─────────────────────────────── */}
                 <div className="card-berry overflow-hidden bg-card" style={{borderRadius:'var(--radius-lg)'}}>

@@ -47,7 +47,18 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => session('success'),
                 'error' => session('error'),
+                'warning' => session('warning'),
+                'info' => session('info'),
+                'receipt' => session('receipt'),
             ],
+            'notifications' => $user ? [
+                'unread_count' => $user->unreadNotifications()->count(),
+                'recent' => $user->unreadNotifications()->latest()->take(5)->get()->map(fn ($n) => [
+                    'id' => $n->id,
+                    'data' => $n->data,
+                    'created_at' => $n->created_at->diffForHumans(),
+                ])->toArray(),
+            ] : ['unread_count' => 0, 'recent' => []],
             'auth' => [
                 'user' => $request->user(),
                 'roles' => $user ? $user->getRoleNames()->values() : [],
